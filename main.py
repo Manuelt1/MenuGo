@@ -1,6 +1,7 @@
 """
 main.py  ─  Controlador de navegación de Menugo.
 Sprint 2: añadidos _ir_menu_dia() y _ir_filtros().
+Sprint 3: añadido _ir_mapa().
 Ejecutar con: python main.py
 """
 
@@ -12,6 +13,7 @@ from ui.main      import PantallaPrincipal
 from ui.favoritos import PantallaFavoritos
 from ui.menu_dia  import PantallaMenuDia
 from ui.filtros   import PantallaFiltros
+from ui.mapa      import PantallaMapa
 
 BG_PRINCIPAL = "#0F1923"
 
@@ -66,6 +68,7 @@ class AppMenugo(tk.Tk):
                 on_favoritos=self._ir_favoritos,
                 on_menu_dia=self._ir_menu_dia,
                 on_filtros=self._ir_filtros,
+                on_mapa=self._ir_mapa,          # ← nuevo
             )
         )
 
@@ -94,6 +97,15 @@ class AppMenugo(tk.Tk):
     def _ir_filtros(self):
         self._cambiar_frame(
             PantallaFiltros(
+                self,
+                on_volver=self._ir_principal,
+                usuario=self._usuario_activo,
+            )
+        )
+
+    def _ir_mapa(self):                          # ← nuevo
+        self._cambiar_frame(
+            PantallaMapa(
                 self,
                 on_volver=self._ir_principal,
                 usuario=self._usuario_activo,

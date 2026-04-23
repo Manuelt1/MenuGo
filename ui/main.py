@@ -2,6 +2,7 @@
 ui/main.py
 Pantalla principal de Menugo.
 Sprint 2: añadidos botones ⭐ Menú del día y 🔍 Buscar en el header.
+Sprint 3: añadido botón 🗺 Mapa.
 """
 
 import tkinter as tk
@@ -32,8 +33,9 @@ class PantallaPrincipal(tk.Frame):
     Callbacks:
       on_categoria(str)  → navegar a productos de esa categoría
       on_favoritos()     → navegar a favoritos
-      on_menu_dia()      → navegar al menú del día   [Sprint 2]
-      on_filtros()       → navegar a búsqueda        [Sprint 2]
+      on_menu_dia()      → navegar al menú del día
+      on_filtros()       → navegar a búsqueda
+      on_mapa()          → navegar al mapa  [Sprint 3]
     """
 
     def __init__(
@@ -44,6 +46,7 @@ class PantallaPrincipal(tk.Frame):
         on_favoritos=None,
         on_menu_dia=None,
         on_filtros=None,
+        on_mapa=None,
     ):
         super().__init__(parent, bg=BG_PRINCIPAL)
         self.usuario      = usuario
@@ -51,6 +54,7 @@ class PantallaPrincipal(tk.Frame):
         self.on_favoritos = on_favoritos
         self.on_menu_dia  = on_menu_dia or (lambda: None)
         self.on_filtros   = on_filtros  or (lambda: None)
+        self.on_mapa      = on_mapa     or (lambda: None)
         self._tarjetas    = []
         self._construir()
 
@@ -84,7 +88,7 @@ class PantallaPrincipal(tk.Frame):
         # Botón Favoritos
         tk.Button(
             header,
-            text=" Favoritos",
+            text="⭐ Favoritos",
             font=("Helvetica", 9, "bold"),
             bg=BG_CARD, fg=COLOR_TEXTO,
             activebackground=BG_CARD_HOVER,
@@ -94,10 +98,10 @@ class PantallaPrincipal(tk.Frame):
             command=lambda: self.on_favoritos() if self.on_favoritos else None,
         ).pack(side="right", padx=4)
 
-        # Botón Menú del día  ── Sprint 2
+        # Botón Menú del día
         tk.Button(
             header,
-            text=" Menú del día",
+            text="⭐ Menú del día",
             font=("Helvetica", 9, "bold"),
             bg=COLOR_ACENTO, fg="#FFFFFF",
             activebackground="#E55A26",
@@ -107,10 +111,10 @@ class PantallaPrincipal(tk.Frame):
             command=self.on_menu_dia,
         ).pack(side="right", padx=4)
 
-        # Botón Buscar  ── Sprint 2
+        # Botón Buscar
         tk.Button(
             header,
-            text=" Buscar",
+            text="🔍 Buscar",
             font=("Helvetica", 9, "bold"),
             bg=BG_CARD, fg=COLOR_TEXTO,
             activebackground=BG_CARD_HOVER,
@@ -118,6 +122,19 @@ class PantallaPrincipal(tk.Frame):
             relief="flat", cursor="hand2",
             padx=10, pady=5,
             command=self.on_filtros,
+        ).pack(side="right", padx=4)
+
+        # Botón Mapa ── Sprint 3
+        tk.Button(
+            header,
+            text="🗺 Mapa",
+            font=("Helvetica", 9, "bold"),
+            bg=BG_CARD, fg=COLOR_TEXTO,
+            activebackground=BG_CARD_HOVER,
+            activeforeground=COLOR_TEXTO,
+            relief="flat", cursor="hand2",
+            padx=10, pady=5,
+            command=self.on_mapa,
         ).pack(side="right", padx=4)
 
     def _construir_saludo(self):
@@ -203,7 +220,7 @@ class PantallaPrincipal(tk.Frame):
         lbl_desc.pack(fill="x")
 
         lbl_count = tk.Label(
-            cuerpo, text=f" {cantidad} {plural}",
+            cuerpo, text=f"● {cantidad} {plural}",
             font=("Helvetica", 10, "bold"),
             bg=BG_CARD, fg=color, anchor="w",
         )
