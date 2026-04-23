@@ -5,7 +5,7 @@ No toca archivos directamente; usa file_handler para todo.
 """
 
 import hashlib
-from menugo.utils.file_handler import (
+from utils.file_handler import (
     buscar_usuario_por_correo,
     agregar_usuario
 )

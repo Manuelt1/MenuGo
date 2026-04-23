@@ -1,16 +1,12 @@
 """
 ui/main.py
 Pantalla principal de Menugo.
-Muestra las categorías de comida disponibles como tarjetas interactivas.
-Al hacer clic en una categoría se navega a la pantalla de productos.
+Sprint 2: añadidos botones ⭐ Menú del día y 🔍 Buscar en el header.
 """
 
 import tkinter as tk
 from utils.file_handler import leer_categorias, leer_restaurantes_por_categoria
 
-# ──────────────────────────────────────────────
-#  Paleta de colores (tema oscuro Menugo)
-# ──────────────────────────────────────────────
 BG_PRINCIPAL  = "#0F1923"
 BG_HEADER     = "#111D2B"
 BG_CARD       = "#1A2535"
@@ -20,34 +16,43 @@ COLOR_TEXTO   = "#F0EDE8"
 COLOR_GRIS    = "#8A9BB0"
 COLOR_BORDE   = "#2A3D55"
 
-# Emoji y color de acento por categoría
 METADATA_CATEGORIA = {
-    "Almuerzos":    {"emoji": "🍲", "color": "#E8593C", "desc": "Platos del día y caseros"},
-    "Comida Rápida":{"emoji": "🍔", "color": "#F0A500", "desc": "Rápido, rico y sin complicaciones"},
-    "Bebidas":      {"emoji": "🥤", "color": "#2196A6", "desc": "Jugos, café y más"},
+    "Almuerzos":     {"emoji": "", "color": "#E8593C", "desc": "Platos del día y caseros"},
+    "Comida Rápida": {"emoji": "", "color": "#F0A500", "desc": "Rápido, rico y sin complicaciones"},
+    "Bebidas":       {"emoji": "", "color": "#2196A6", "desc": "Jugos, café y más"},
 }
-EMOJI_DEFAULT = "🍽️"
+EMOJI_DEFAULT = ""
 COLOR_DEFAULT = "#6C7A9C"
 DESC_DEFAULT  = "Explora esta categoría"
 
 
 class PantallaPrincipal(tk.Frame):
     """
-    Frame de la pantalla principal con tarjetas de categorías.
-    Recibe la ventana raíz y el usuario autenticado.
-    Llama a on_categoria(categoria_str) cuando el usuario selecciona una.
+    Frame principal con tarjetas de categorías.
+    Callbacks:
+      on_categoria(str)  → navegar a productos de esa categoría
+      on_favoritos()     → navegar a favoritos
+      on_menu_dia()      → navegar al menú del día   [Sprint 2]
+      on_filtros()       → navegar a búsqueda        [Sprint 2]
     """
 
-    def __init__(self, parent, usuario: dict, on_categoria=None):
+    def __init__(
+        self,
+        parent,
+        usuario: dict,
+        on_categoria=None,
+        on_favoritos=None,
+        on_menu_dia=None,
+        on_filtros=None,
+    ):
         super().__init__(parent, bg=BG_PRINCIPAL)
-        self.usuario = usuario
+        self.usuario      = usuario
         self.on_categoria = on_categoria
-        self._tarjetas = []   # guardamos refs para efectos hover
+        self.on_favoritos = on_favoritos
+        self.on_menu_dia  = on_menu_dia or (lambda: None)
+        self.on_filtros   = on_filtros  or (lambda: None)
+        self._tarjetas    = []
         self._construir()
-
-    # ──────────────────────────────────────────
-    #  Construcción de la UI
-    # ──────────────────────────────────────────
 
     def _construir(self):
         self._construir_header()
@@ -60,7 +65,7 @@ class PantallaPrincipal(tk.Frame):
         header.pack(fill="x")
         header.pack_propagate(False)
 
-        # Logo / nombre app
+        # Logo
         tk.Label(
             header,
             text="🍽️  Menugo",
@@ -68,17 +73,56 @@ class PantallaPrincipal(tk.Frame):
             bg=BG_HEADER, fg=COLOR_ACENTO,
         ).pack(side="left", padx=24, pady=14)
 
-        # Nombre del usuario (derecha)
+        # Nombre usuario (derecha)
         tk.Label(
             header,
             text=f"👤  {self.usuario.get('nombre', '')}",
-            font=("Helvetica", 11),
+            font=("Helvetica", 10),
             bg=BG_HEADER, fg=COLOR_GRIS,
-        ).pack(side="right", padx=24)
+        ).pack(side="right", padx=16)
+
+        # Botón Favoritos
+        tk.Button(
+            header,
+            text=" Favoritos",
+            font=("Helvetica", 9, "bold"),
+            bg=BG_CARD, fg=COLOR_TEXTO,
+            activebackground=BG_CARD_HOVER,
+            activeforeground=COLOR_TEXTO,
+            relief="flat", cursor="hand2",
+            padx=10, pady=5,
+            command=lambda: self.on_favoritos() if self.on_favoritos else None,
+        ).pack(side="right", padx=4)
+
+        # Botón Menú del día  ── Sprint 2
+        tk.Button(
+            header,
+            text=" Menú del día",
+            font=("Helvetica", 9, "bold"),
+            bg=COLOR_ACENTO, fg="#FFFFFF",
+            activebackground="#E55A26",
+            activeforeground="#FFFFFF",
+            relief="flat", cursor="hand2",
+            padx=10, pady=5,
+            command=self.on_menu_dia,
+        ).pack(side="right", padx=4)
+
+        # Botón Buscar  ── Sprint 2
+        tk.Button(
+            header,
+            text=" Buscar",
+            font=("Helvetica", 9, "bold"),
+            bg=BG_CARD, fg=COLOR_TEXTO,
+            activebackground=BG_CARD_HOVER,
+            activeforeground=COLOR_TEXTO,
+            relief="flat", cursor="hand2",
+            padx=10, pady=5,
+            command=self.on_filtros,
+        ).pack(side="right", padx=4)
 
     def _construir_saludo(self):
         saludo_frame = tk.Frame(self, bg=BG_PRINCIPAL)
-        saludo_frame.pack(fill="x", padx=32, pady=(28, 4))
+        saludo_frame.pack(fill="x", padx=32, pady=(24, 4))
 
         tk.Label(
             saludo_frame,
@@ -96,12 +140,10 @@ class PantallaPrincipal(tk.Frame):
             anchor="w",
         ).pack(fill="x", pady=(4, 0))
 
-        # Separador
-        sep = tk.Frame(self, bg=COLOR_BORDE, height=1)
-        sep.pack(fill="x", padx=32, pady=20)
+        tk.Frame(self, bg=COLOR_BORDE, height=1).pack(fill="x", padx=32, pady=16)
 
     def _construir_grid_categorias(self):
-        categorias = leer_categorias()   # ["Almuerzos", "Bebidas", "Comida Rápida"]
+        categorias = leer_categorias()
 
         if not categorias:
             tk.Label(
@@ -115,14 +157,11 @@ class PantallaPrincipal(tk.Frame):
         contenedor = tk.Frame(self, bg=BG_PRINCIPAL)
         contenedor.pack(fill="both", expand=True, padx=32)
 
-        # Configurar columnas (2 columnas)
         contenedor.columnconfigure(0, weight=1)
         contenedor.columnconfigure(1, weight=1)
 
         for i, cat in enumerate(categorias):
-            fila = i // 2
-            col  = i % 2
-            self._crear_tarjeta(contenedor, cat, fila, col)
+            self._crear_tarjeta(contenedor, cat, i // 2, i % 2)
 
     def _crear_tarjeta(self, parent, categoria: str, fila: int, col: int):
         meta  = METADATA_CATEGORIA.get(categoria, {})
@@ -130,83 +169,57 @@ class PantallaPrincipal(tk.Frame):
         color = meta.get("color", COLOR_DEFAULT)
         desc  = meta.get("desc",  DESC_DEFAULT)
 
-        # Contar restaurantes de esta categoría
         cantidad = len(leer_restaurantes_por_categoria(categoria))
         plural   = "restaurante" if cantidad == 1 else "restaurantes"
 
-        # Frame exterior (borde de color al hover)
         outer = tk.Frame(parent, bg=BG_PRINCIPAL, padx=6, pady=6)
         outer.grid(row=fila, column=col, sticky="nsew", padx=8, pady=8)
         parent.rowconfigure(fila, weight=1)
 
-        # Frame de la tarjeta
         card = tk.Frame(outer, bg=BG_CARD, cursor="hand2")
         card.pack(fill="both", expand=True)
 
-        # Franja superior de color
         franja = tk.Frame(card, bg=color, height=5)
         franja.pack(fill="x")
 
-        # Cuerpo de la tarjeta
         cuerpo = tk.Frame(card, bg=BG_CARD, padx=20, pady=20)
         cuerpo.pack(fill="both", expand=True)
 
-        # Emoji grande
-        lbl_emoji = tk.Label(
-            cuerpo,
-            text=emoji,
-            font=("Helvetica", 38),
-            bg=BG_CARD,
-        )
+        lbl_emoji = tk.Label(cuerpo, text=emoji, font=("Helvetica", 38), bg=BG_CARD)
         lbl_emoji.pack(anchor="w")
 
-        # Nombre de categoría
         lbl_cat = tk.Label(
-            cuerpo,
-            text=categoria,
+            cuerpo, text=categoria,
             font=("Georgia", 15, "bold"),
-            bg=BG_CARD, fg=COLOR_TEXTO,
-            anchor="w",
+            bg=BG_CARD, fg=COLOR_TEXTO, anchor="w",
         )
         lbl_cat.pack(fill="x", pady=(8, 2))
 
-        # Descripción
         lbl_desc = tk.Label(
-            cuerpo,
-            text=desc,
+            cuerpo, text=desc,
             font=("Helvetica", 10),
-            bg=BG_CARD, fg=COLOR_GRIS,
-            anchor="w",
+            bg=BG_CARD, fg=COLOR_GRIS, anchor="w",
         )
         lbl_desc.pack(fill="x")
 
-        # Contador de restaurantes
         lbl_count = tk.Label(
-            cuerpo,
-            text=f"📍 {cantidad} {plural}",
+            cuerpo, text=f" {cantidad} {plural}",
             font=("Helvetica", 10, "bold"),
-            bg=BG_CARD, fg=color,
-            anchor="w",
+            bg=BG_CARD, fg=color, anchor="w",
         )
         lbl_count.pack(fill="x", pady=(12, 0))
 
-        # ── Efectos hover ──────────────────────
         todos = [card, cuerpo, franja, lbl_emoji, lbl_cat, lbl_desc, lbl_count]
 
-        def on_enter(e, widgets=todos, c=BG_CARD_HOVER):
+        def on_enter(e, widgets=todos):
             for w in widgets:
-                try:
-                    w.configure(bg=c)
-                except Exception:
-                    pass
+                try: w.configure(bg=BG_CARD_HOVER)
+                except Exception: pass
 
-        def on_leave(e, widgets=todos, c=BG_CARD):
+        def on_leave(e, widgets=todos):
             for w in widgets:
-                try:
-                    w.configure(bg=c)
-                    # franja mantiene su color
-                except Exception:
-                    pass
+                try: w.configure(bg=BG_CARD)
+                except Exception: pass
             franja.configure(bg=color)
 
         def on_click(e, cat=categoria):
@@ -214,8 +227,8 @@ class PantallaPrincipal(tk.Frame):
                 self.on_categoria(cat)
 
         for widget in todos:
-            widget.bind("<Enter>", on_enter)
-            widget.bind("<Leave>", on_leave)
+            widget.bind("<Enter>",    on_enter)
+            widget.bind("<Leave>",    on_leave)
             widget.bind("<Button-1>", on_click)
 
         self._tarjetas.append(card)
@@ -224,41 +237,9 @@ class PantallaPrincipal(tk.Frame):
         footer = tk.Frame(self, bg=BG_HEADER, height=36)
         footer.pack(fill="x", side="bottom")
         footer.pack_propagate(False)
-
         tk.Label(
             footer,
             text="Menugo © 2025  —  Tu guía de sabores",
             font=("Helvetica", 9),
             bg=BG_HEADER, fg=COLOR_GRIS,
         ).pack(expand=True)
-
-
-# ──────────────────────────────────────────────
-#  Prueba independiente (python ui/main.py)
-# ──────────────────────────────────────────────
-if __name__ == "__main__":
-    from ui.productos import abrir_productos   # importación diferida para pruebas
-
-    usuario_prueba = {"nombre": "Ana García", "correo": "ana@test.com"}
-
-    root = tk.Tk()
-    root.title("Menugo")
-    root.geometry("620x560")
-    root.configure(bg=BG_PRINCIPAL)
-    root.resizable(False, False)
-
-    def al_seleccionar_categoria(cat):
-        # Destruye el frame actual y abre productos
-        for w in root.winfo_children():
-            w.destroy()
-        abrir_productos(cat, usuario_prueba, on_volver=lambda: _reabrir_main())
-
-    def _reabrir_main():
-        for w in root.winfo_children():
-            w.destroy()
-        pantalla = PantallaPrincipal(root, usuario_prueba, on_categoria=al_seleccionar_categoria)
-        pantalla.pack(fill="both", expand=True)
-
-    pantalla = PantallaPrincipal(root, usuario_prueba, on_categoria=al_seleccionar_categoria)
-    pantalla.pack(fill="both", expand=True)
-    root.mainloop()
