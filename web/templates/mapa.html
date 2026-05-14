@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menugo — Mapa de Restaurantes</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+
+    <style>
+        /* ── Reset & Base ───────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0F1923;
+            --header: #111D2B;
+            --card: #1A2535;
+            --acento: #FF6B35;
+            --texto: #F0EDE8;
+            --gris: #8A9BB0;
+            --borde: #2A3D55;
+            --almuerzo: #E8593C;
+            --rapida: #F0A500;
+            --bebida: #2196A6;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--texto);
+        }
+
+        /* ── Layout ─────────────────────────────────── */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* ── Header ─────────────────────────────────── */
+        header {
+            background: var(--header);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 20px;
+            height: 58px;
+            border-bottom: 1px solid var(--borde);
+            flex-shrink: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--acento);
+            letter-spacing: -.3px;
+        }
+
+        .logo span {
+            font-size: .85rem;
+            font-weight: 400;
+            color: var(--gris);
+            margin-left: 8px;
+        }
+
+        header nav {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-nav {
+            background: var(--card);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .2s;
+        }
+
+        .btn-nav:hover {
+            background: #22304A;
+        }
+
+        .btn-nav.activo {
+            background: var(--acento);
+            border-color: var(--acento);
+            color: #fff;
+        }
+
+        /* ── Barra de filtros ───────────────────────── */
+        #filtros {
+            background: var(--card);
+            border-bottom: 1px solid var(--borde);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        #filtros label {
+            font-size: .78rem;
+            color: var(--gris);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            font-size: .8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            user-select: none;
+        }
+
+        .chip.todos {
+            background: var(--gris);
+            color: #fff;
+        }
+
+        .chip.almuerzo {
+            background: var(--almuerzo);
+            color: #fff;
+        }
+
+        .chip.rapida {
+            background: var(--rapida);
+            color: #fff;
+        }
+
+        .chip.bebida {
+            background: var(--bebida);
+            color: #fff;
+        }
+
+        .chip.inactivo {
+            opacity: .35;
+        }
+
+        .chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+        }
+
+        #contador {
+            margin-left: auto;
+            font-size: .78rem;
+            color: var(--gris);
+            font-weight: 500;
+        }
+
+        /* ── Mapa ───────────────────────────────────── */
+        #mapa {
+            flex: 1;
+            z-index: 1;
+        }
+
+        /* ── Popup personalizado ────────────────────── */
+        .leaflet-popup-content-wrapper {
+            background: var(--card) !important;
+            border: 1px solid var(--borde) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .5) !important;
+            padding: 0 !important;
+            overflow: hidden;
+            min-width: 260px;
+        }
+
+        .leaflet-popup-tip {
+            background: var(--card) !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: auto !important;
+        }
+
+        .popup-franja {
+            height: 5px;
+        }
+
+        .popup-body {
+            padding: 16px 18px 14px;
+        }
+
+        .popup-emoji {
+            font-size: 2rem;
+            text-align: center;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .popup-nombre {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--texto);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .popup-badge {
+            display: inline-block;
+            font-size: .7rem;
+            font-weight: 700;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin: 0 auto 10px;
+            display: block;
+            text-align: center;
+            width: fit-content;
+            margin: 0 auto 10px;
+        }
+
+        .popup-info {
+            list-style: none;
+            margin-bottom: 12px;
+        }
+
+        .popup-info li {
+            display: flex;
+            gap: 8px;
+            font-size: .8rem;
+            color: var(--gris);
+            padding: 3px 0;
+        }
+
+        .popup-info li span:first-child {
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .popup-info li span:last-child {
+            color: var(--texto);
+        }
+
+        .popup-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .popup-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: .78rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+
+        .popup-btn:hover {
+            opacity: .85;
+        }
+
+        .popup-btn.maps {
+            background: var(--acento);
+            color: #fff;
+        }
+
+        .popup-btn.pago {
+            background: #2ECC71;
+            color: #fff;
+        }
+
+        /* ── Marcador SVG custom ────────────────────── */
+        .marker-pin {
+            width: 36px;
+            height: 44px;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .4));
+            transition: transform .15s;
+        }
+
+        .marker-pin:hover {
+            transform: scale(1.15);
+        }
+
+        /* ── Leyenda ────────────────────────────────── */
+        .leyenda {
+            background: var(--card);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: .75rem;
+            color: var(--gris);
+            line-height: 1.8;
+        }
+
+        .leyenda-titulo {
+            font-weight: 700;
+            color: var(--texto);
+            margin-bottom: 6px;
+            font-size: .8rem;
+        }
+
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leyenda-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- Header -->
+        <header>
+            <div class="logo">🍽️ Menugo <span>Mapa de Restaurantes · Tuluá</span></div>
+            <nav>
+                <a href="/guia" class="btn-nav">📖 Guía</a>
+                <a href="/" class="btn-nav">🏠 Inicio</a>
+            </nav>
+        </header>
+
+        <!-- Filtros -->
+        <div id="filtros">
+            <label>Filtrar por:</label>
+            <div class="chip todos" data-cat="Todos" onclick="filtrar(this)">🍽️ Todos</div>
+            <div class="chip almuerzo" data-cat="Almuerzos" onclick="filtrar(this)">🍲 Almuerzos</div>
+            <div class="chip rapida" data-cat="Comida Rápida" onclick="filtrar(this)">🍔 Comida Rápida</div>
+            <div class="chip bebida" data-cat="Bebidas" onclick="filtrar(this)">🥤 Bebidas</div>
+            <span id="contador">Cargando...</span>
+        </div>
+
+        <!-- Mapa -->
+        <div id="mapa"></div>
+
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+
+    <script>
+        /* ── Constantes ─────────────────────────────────────────────────── */
+        const COLORES = {
+            "Almuerzos": "#E8593C",
+            "Comida Rápida": "#F0A500",
+            "Bebidas": "#2196A6",
+        };
+        const EMOJIS = {
+            "Almuerzos": "🍲",
+            "Comida Rápida": "🍔",
+            "Bebidas": "🥤",
+        };
+
+        /* ── Mapa Leaflet ───────────────────────────────────────────────── */
+        const mapa = L.map("mapa", {
+            center: [4.08377, -76.19649],
+            zoom: 14,
+            zoomControl: true,
+        });
+
+        // Tiles con tema oscuro (CartoDB Dark Matter)
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a> | Menugo 2025',
+            subdomains: "abcd",
+            maxZoom: 19,
+        }).addTo(mapa);
+
+        /* ── Leyenda ────────────────────────────────────────────────────── */
+        const leyenda = L.control({ position: "bottomleft" });
+        leyenda.onAdd = () => {
+            const d = L.DomUtil.create("div", "leyenda");
+            d.innerHTML = `
+    <div class="leyenda-titulo">Categorías</div>
+    <div class="leyenda-item"><div class="leyenda-dot" style="background:#E8593C"></div> Almuerzos</div>
+    <div class="leyenda-item"><div class="leyenda-dot" style="background:#F0A500"></div> Comida Rápida</div>
+    <div class="leyenda-item"><div class="leyenda-dot" style="background:#2196A6"></div> Bebidas</div>
+  `;
+            return d;
+        };
+        leyenda.addTo(mapa);
+
+        /* ── Generar icono SVG pin por categoría ────────────────────────── */
+        function crearIcono(categoria, emoji) {
+            const color = COLORES[categoria] || "#FF6B35";
+            const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+      <defs>
+        <filter id="sombra" x="-30%" y="-20%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.4"/>
+        </filter>
+      </defs>
+      <!-- Pin body -->
+      <path d="M18 2C10.27 2 4 8.27 4 16c0 10 14 26 14 26S32 26 32 16C32 8.27 25.73 2 18 2z"
+            fill="${color}" filter="url(#sombra)"/>
+      <!-- Círculo interior blanco -->
+      <circle cx="18" cy="16" r="10" fill="white" opacity="0.95"/>
+      <!-- Emoji centrado -->
+      <text x="18" y="21" text-anchor="middle" font-size="12">${emoji}</text>
+    </svg>`;
+
+            return L.divIcon({
+                html: `<div class="marker-pin">${svg}</div>`,
+                iconSize: [36, 44],
+                iconAnchor: [18, 44],
+                popupAnchor: [0, -44],
+                className: "",
+            });
+        }
+
+        /* ── Construir popup HTML ───────────────────────────────────────── */
+        function htmlPopup(r) {
+            const color = COLORES[r.categoria] || "#FF6B35";
+            const emoji = r.imagen_emoji || EMOJIS[r.categoria] || "🍽️";
+            const prods = (r.productos || []).length;
+            const query = encodeURIComponent((r.direccion || r.nombre) + ", Tuluá Colombia");
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+            // Producto más barato para el botón de pago
+            const productos = r.productos || [];
+            const barato = productos.sort((a, b) => a.precio - b.precio)[0];
+            const pagoUrl = barato
+                ? `/pago?restaurante_id=${r.id}&producto_id=${barato.id}`
+                : `/pago?restaurante_id=${r.id}`;
+
+            return `
+    <div class="popup-franja" style="background:${color}"></div>
+    <div class="popup-body">
+      <span class="popup-emoji">${emoji}</span>
+      <div class="popup-nombre">${r.nombre}</div>
+      <span class="popup-badge" style="background:${color}">${r.categoria}</span>
+      <ul class="popup-info">
+        ${r.direccion ? `<li><span>📍</span><span>${r.direccion}</span></li>` : ""}
+        ${r.telefono ? `<li><span>📞</span><span>${r.telefono}</span></li>` : ""}
+        ${r.horario ? `<li><span>🕐</span><span>${r.horario}</span></li>` : ""}
+        ${prods ? `<li><span>🍴</span><span>${prods} productos en carta</span></li>` : ""}
+      </ul>
+      <div class="popup-btns">
+        <a class="popup-btn maps" href="${mapsUrl}" target="_blank">📍 Ver en Maps</a>
+        <a class="popup-btn pago" href="${pagoUrl}"  target="_blank">💳 Pagar</a>
+      </div>
+    </div>`;
+        }
+
+        /* ── Estado global ──────────────────────────────────────────────── */
+        let todosRestaurantes = [];
+        let grupoMarcadores = L.markerClusterGroup({ showCoverageOnHover: false });
+        mapa.addLayer(grupoMarcadores);
+
+        /* ── Cargar datos desde API ─────────────────────────────────────── */
+        async function cargarRestaurantes() {
+            const res = await fetch("/api/restaurantes");
+            todosRestaurantes = await res.json();
+            renderizarMarcadores(todosRestaurantes);
+        }
+
+        /* ── Renderizar marcadores ──────────────────────────────────────── */
+        function renderizarMarcadores(lista) {
+            grupoMarcadores.clearLayers();
+
+            lista.forEach(r => {
+                if (!r.lat || !r.lng) return;
+                const marcador = L.marker([r.lat, r.lng], { icon: crearIcono(r.categoria, r.imagen_emoji) });
+                marcador.bindPopup(htmlPopup(r), { maxWidth: 300 });
+                grupoMarcadores.addLayer(marcador);
+            });
+
+            document.getElementById("contador").textContent =
+                `${lista.length} lugar${lista.length !== 1 ? "es" : ""}`;
+        }
+
+        /* ── Filtro por categoría ───────────────────────────────────────── */
+        function filtrar(chip) {
+            document.querySelectorAll(".chip").forEach(c => c.classList.add("inactivo"));
+            chip.classList.remove("inactivo");
+
+            const cat = chip.dataset.cat;
+            const filtrados = cat === "Todos"
+                ? todosRestaurantes
+                : todosRestaurantes.filter(r => r.categoria === cat);
+
+            renderizarMarcadores(filtrados);
+        }
+
+        /* ── Init ───────────────────────────────────────────────────────── */
+        cargarRestaurantes();
+    </script>
+</body>
+
+</html>

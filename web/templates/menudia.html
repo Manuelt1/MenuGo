@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — Menú del día{% endblock %}
+
+{% block head_extra %}
+<style>
+    .page-header {
+        background: var(--card);
+        border-bottom: 4px solid #F0A500;
+        padding: 28px;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin-top: 4px;
+    }
+
+    .grid-menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 18px;
+    }
+
+    .menu-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform .18s, border-color .18s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menu-card:hover {
+        transform: translateY(-3px);
+        border-color: #F0A500;
+    }
+
+    .menu-franja {
+        height: 4px;
+        background: #F0A500;
+    }
+
+    .menu-body {
+        padding: 18px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .menu-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .menu-nombre {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .menu-precio {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #F0A500;
+        white-space: nowrap;
+    }
+
+    .menu-desc {
+        font-size: .82rem;
+        color: var(--gris);
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .menu-rest {
+        font-size: .78rem;
+        color: var(--gris);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .menu-rest span:last-child {
+        color: var(--texto);
+        font-weight: 500;
+    }
+
+    .badge-estrella {
+        display: inline-block;
+        background: rgba(240, 165, 0, .15);
+        color: #F0A500;
+        border: 1px solid rgba(240, 165, 0, .3);
+        border-radius: 8px;
+        font-size: .72rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        width: fit-content;
+    }
+
+    .menu-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--borde);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-pagar {
+        background: var(--acento);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: .8rem;
+        font-weight: 700;
+        padding: 7px 16px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .18s;
+    }
+
+    .btn-pagar:hover {
+        background: #e05a25;
+    }
+
+    .vacio {
+        text-align: center;
+        padding: 100px 20px;
+        color: var(--gris);
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="page-header">
+    <h1>⭐ Menú del día</h1>
+    <p>{{ productos | length }} oferta{{ 's' if productos | length != 1 else '' }} disponible{{ 's' if productos |
+        length != 1 else '' }} hoy</p>
+</div>
+
+<div class="contenedor">
+    {% if productos %}
+    <div class="grid-menu">
+        {% for p in productos %}
+        <div class="menu-card">
+            <div class="menu-franja"></div>
+            <div class="menu-body">
+                <div class="menu-top">
+                    <span class="menu-nombre">{{ p.nombre }}</span>
+                    <span class="menu-precio">${{ '{:,}'.format(p.precio) }}</span>
+                </div>
+                {% if p.descripcion %}
+                <p class="menu-desc">{{ p.descripcion }}</p>
+                {% endif %}
+                <div class="menu-rest">
+                    <span>📍</span>
+                    <span>{{ p.restaurante }}</span>
+                </div>
+                <span class="badge-estrella">⭐ Oferta del día</span>
+            </div>
+            <div class="menu-footer">
+                <a href="/pago?restaurante_id={{ p.restaurante_id }}&producto_id={{ p.id }}" class="btn-pagar">💳
+                    Pagar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="vacio">
+        <div style="font-size:3.5rem;margin-bottom:14px">⭐</div>
+        No hay ofertas del menú del día disponibles hoy.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

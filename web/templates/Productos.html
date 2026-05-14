@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — {{ categoria }}{% endblock %}
+
+{% block head_extra %}
+{% set color_cat = {'Almuerzos': '#E8593C', 'Comida Rápida': '#F0A500', 'Bebidas': '#2196A6'}.get(categoria, '#FF6B35')
+%}
+<style>
+    .page-header {
+        background: var(--card);
+
+        border-bottom: 4px solid {
+                {
+                color_cat
+            }
+        }
+
+        ;
+        padding: 28px;
+    }
+
+    .page-header .back {
+        font-size: .82rem;
+        color: var(--gris);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+        transition: color .15s;
+    }
+
+    .page-header .back:hover {
+        color: var(--texto);
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin-top: 4px;
+    }
+
+    .grid-productos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 18px;
+    }
+
+    .prod-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform .18s, border-color .18s;
+    }
+
+    .prod-card:hover {
+        transform: translateY(-3px);
+
+        border-color: {
+                {
+                color_cat
+            }
+        }
+
+        ;
+    }
+
+    .prod-franja {
+        height: 4px;
+
+        background: {
+                {
+                color_cat
+            }
+        }
+
+        ;
+    }
+
+    .prod-body {
+        padding: 18px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .prod-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .prod-nombre {
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .prod-precio {
+        font-size: 1rem;
+        font-weight: 800;
+
+        color: {
+                {
+                color_cat
+            }
+        }
+
+        ;
+        white-space: nowrap;
+    }
+
+    .prod-desc {
+        font-size: .82rem;
+        color: var(--gris);
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .prod-rest {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .78rem;
+        color: var(--gris);
+        margin-top: 4px;
+    }
+
+    .prod-rest span:last-child {
+        color: var(--texto);
+        font-weight: 500;
+    }
+
+    .badge-menu {
+        display: inline-block;
+        background: rgba(255, 193, 7, .15);
+        color: #F0A500;
+        border: 1px solid rgba(240, 165, 0, .3);
+        border-radius: 8px;
+        font-size: .72rem;
+        font-weight: 700;
+        padding: 2px 8px;
+    }
+
+    .prod-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--borde);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .btn-favorito {
+        background: transparent;
+        border: 1px solid var(--borde);
+        border-radius: 8px;
+        color: var(--gris);
+        font-size: .8rem;
+        font-weight: 600;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: all .18s;
+    }
+
+    .btn-favorito:hover {
+        border-color: #e05252;
+        color: #e05252;
+    }
+
+    .btn-favorito.guardado {
+        border-color: #e05252;
+        color: #e05252;
+        background: rgba(224, 82, 82, .08);
+    }
+
+    .btn-pagar {
+        background: var(--acento);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: .8rem;
+        font-weight: 700;
+        padding: 7px 16px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .18s;
+    }
+
+    .btn-pagar:hover {
+        background: #e05a25;
+    }
+
+    .vacio {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--gris);
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="page-header">
+    <a href="/principal" class="back">← Volver al inicio</a>
+    <h1>
+        {% if categoria == 'Almuerzos' %}🍱
+        {% elif categoria == 'Comida Rápida' %}🍔
+        {% else %}🥤{% endif %}
+        {{ categoria }}
+    </h1>
+    <p>{{ productos | length }} producto{{ 's' if productos | length != 1 else '' }} disponibles</p>
+</div>
+
+<div class="contenedor">
+    {% if productos %}
+    <div class="grid-productos">
+        {% for p in productos %}
+        <div class="prod-card" id="card-{{ p.id }}">
+            <div class="prod-franja"></div>
+            <div class="prod-body">
+                <div class="prod-top">
+                    <span class="prod-nombre">{{ p.nombre }}</span>
+                    <span class="prod-precio">${{ '{:,}'.format(p.precio) }}</span>
+                </div>
+                {% if p.descripcion %}
+                <p class="prod-desc">{{ p.descripcion }}</p>
+                {% endif %}
+                <div class="prod-rest">
+                    <span>📍</span>
+                    <span>{{ p.restaurante }}</span>
+                </div>
+                {% if p.menu_del_dia %}
+                <span class="badge-menu">⭐ Menú del día</span>
+                {% endif %}
+            </div>
+            <div class="prod-footer">
+                <button class="btn-favorito" onclick="toggleFavorito('{{ p.restaurante_id }}', this)">
+                    🤍 Guardar
+                </button>
+                <a href="/pago?restaurante_id={{ p.restaurante_id }}&producto_id={{ p.id }}" class="btn-pagar">💳
+                    Pagar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="vacio">
+        <div style="font-size:3rem;margin-bottom:12px">🍽️</div>
+        No hay productos disponibles en esta categoría.
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    async function toggleFavorito(restauranteId, btn) {
+        const guardado = btn.classList.contains('guardado');
+        const method = guardado ? 'DELETE' : 'POST';
+        try {
+            const res = await fetch('/api/favorito', {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ restaurante_id: restauranteId })
+            });
+            const data = await res.json();
+            if (data.exito) {
+                if (data.es_favorito) {
+                    btn.textContent = '❤️ Guardado';
+                    btn.classList.add('guardado');
+                } else {
+                    btn.textContent = '🤍 Guardar';
+                    btn.classList.remove('guardado');
+                }
+            }
+        } catch (e) { alert('Error al actualizar favorito.'); }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — Inicio{% endblock %}
+
+{% block head_extra %}
+<style>
+    .hero {
+        background: var(--card);
+        border-bottom: 1px solid var(--borde);
+        padding: 40px 28px 36px;
+        text-align: center;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .hero h1 span {
+        color: var(--acento);
+    }
+
+    .hero p {
+        font-size: 1rem;
+        color: var(--gris);
+    }
+
+    .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: 32px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        text-align: center;
+    }
+
+    .stat-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--acento);
+        display: block;
+    }
+
+    .stat-lbl {
+        font-size: .78rem;
+        color: var(--gris);
+    }
+
+    /* Categorías */
+    .seccion-titulo {
+        font-size: .78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--gris);
+        margin-bottom: 16px;
+    }
+
+    .grid-cats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+        margin-bottom: 48px;
+    }
+
+    .cat-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 16px;
+        padding: 28px 24px;
+        text-decoration: none;
+        color: var(--texto);
+        transition: transform .18s, border-color .18s, box-shadow .18s;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--cat-color);
+    }
+
+    .cat-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--cat-color);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, .35);
+    }
+
+    .cat-emoji {
+        font-size: 2.6rem;
+    }
+
+    .cat-nombre {
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    .cat-count {
+        font-size: .82rem;
+        color: var(--gris);
+    }
+
+    .cat-arrow {
+        margin-top: auto;
+        font-size: .8rem;
+        font-weight: 700;
+        color: var(--cat-color);
+        opacity: 0;
+        transition: opacity .18s;
+    }
+
+    .cat-card:hover .cat-arrow {
+        opacity: 1;
+    }
+
+    /* Accesos rápidos */
+    .grid-accesos {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .acceso {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 12px;
+        padding: 18px 14px;
+        text-align: center;
+        text-decoration: none;
+        color: var(--texto);
+        transition: background .18s, border-color .18s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .acceso:hover {
+        background: #1e2f44;
+        border-color: var(--acento);
+    }
+
+    .acceso .a-emoji {
+        font-size: 1.8rem;
+    }
+
+    .acceso .a-label {
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+    .acceso .a-sub {
+        font-size: .72rem;
+        color: var(--gris);
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="hero">
+    <h1>Hola, <span>{{ usuario.nombre }}</span> 👋</h1>
+    <p>¿Qué vas a comer hoy en Tuluá?</p>
+    <div class="hero-stats">
+        <div class="stat">
+            <span class="stat-num">{{ total_restaurantes }}</span>
+            <span class="stat-lbl">Restaurantes</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">{{ categorias | length }}</span>
+            <span class="stat-lbl">Categorías</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">🌶️</span>
+            <span class="stat-lbl">Tuluá, Valle</span>
+        </div>
+    </div>
+</div>
+
+<div class="contenedor">
+
+    <!-- Categorías -->
+    <p class="seccion-titulo">Explorar por categoría</p>
+    <div class="grid-cats">
+        {% set config_cats = {
+        'Almuerzos': {'emoji': '🍱', 'color': '#E8593C'},
+        'Comida Rápida': {'emoji': '🍔', 'color': '#F0A500'},
+        'Bebidas': {'emoji': '🥤', 'color': '#2196A6'}
+        } %}
+        {% for cat, count in categorias.items() %}
+        {% set cfg = config_cats.get(cat, {'emoji': '🍽️', 'color': '#FF6B35'}) %}
+        <a href="/productos/{{ cat | urlencode }}" class="cat-card" style="--cat-color: {{ cfg.color }}">
+            <span class="cat-emoji">{{ cfg.emoji }}</span>
+            <span class="cat-nombre">{{ cat }}</span>
+            <span class="cat-count">{{ count }} restaurante{{ 's' if count != 1 else '' }}</span>
+            <span class="cat-arrow">Ver productos →</span>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Accesos rápidos -->
+    <p class="seccion-titulo">Accesos rápidos</p>
+    <div class="grid-accesos">
+        <a href="/menu-dia" class="acceso">
+            <span class="a-emoji">⭐</span>
+            <span class="a-label">Menú del día</span>
+            <span class="a-sub">Ofertas de hoy</span>
+        </a>
+        <a href="/favoritos" class="acceso">
+            <span class="a-emoji">❤️</span>
+            <span class="a-label">Favoritos</span>
+            <span class="a-sub">Mis guardados</span>
+        </a>
+        <a href="/filtros" class="acceso">
+            <span class="a-emoji">🔍</span>
+            <span class="a-label">Buscar</span>
+            <span class="a-sub">Por nombre o precio</span>
+        </a>
+        <a href="/mapa" class="acceso">
+            <span class="a-emoji">🗺️</span>
+            <span class="a-label">Mapa</span>
+            <span class="a-sub">Ver ubicaciones</span>
+        </a>
+        <a href="/guia" class="acceso">
+            <span class="a-emoji">📖</span>
+            <span class="a-label">Guía</span>
+            <span class="a-sub">Cómo usar la app</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}

@@ -5,9 +5,11 @@
         "categoria": "Almuerzos",
         "descripcion": "Comida casera tradicional colombiana desde 1985",
         "imagen_emoji": "🍲",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Lun-Sáb 11:00am - 3:00pm",
+        "lat": 4.087,
+        "lng": -76.195,
         "productos": [
             {
                 "id": "p001",
@@ -45,9 +47,11 @@
         "categoria": "Almuerzos",
         "descripcion": "Almuerzos ejecutivos y menú del día a precios justos",
         "imagen_emoji": "🍽️",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Lun-Vie 11:00am - 3:00pm",
+        "lat": 4.085,
+        "lng": -76.196,
         "productos": [
             {
                 "id": "p005",
@@ -78,9 +82,11 @@
         "categoria": "Almuerzos",
         "descripcion": "Carnes a la parrilla y platos típicos de la región",
         "imagen_emoji": "🥩",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Mar-Dom 12:00pm - 9:00pm",
+        "lat": 4.082,
+        "lng": -76.197,
         "productos": [
             {
                 "id": "p008",
@@ -118,9 +124,11 @@
         "categoria": "Almuerzos",
         "descripcion": "Cocina de pueblo con recetas de generación en generación",
         "imagen_emoji": "👵",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Lun-Sáb 10:00am - 4:00pm",
+        "lat": 4.089,
+        "lng": -76.193,
         "productos": [
             {
                 "id": "p012",
@@ -151,9 +159,11 @@
         "categoria": "Comida Rápida",
         "descripcion": "Hamburguesas artesanales con ingredientes frescos",
         "imagen_emoji": "🍔",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Todos los días 12:00pm - 10:00pm",
+        "lat": 4.081,
+        "lng": -76.199,
         "productos": [
             {
                 "id": "p015",
@@ -191,9 +201,11 @@
         "categoria": "Comida Rápida",
         "descripcion": "Pizzas al horno de leña y combos familiares",
         "imagen_emoji": "🍕",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Mar-Dom 5:00pm - 11:00pm",
+        "lat": 4.086,
+        "lng": -76.201,
         "productos": [
             {
                 "id": "p019",
@@ -224,9 +236,11 @@
         "categoria": "Comida Rápida",
         "descripcion": "Comida mexicana auténtica hecha al momento",
         "imagen_emoji": "🌮",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Lun-Dom 12:00pm - 9:00pm",
+        "lat": 4.083,
+        "lng": -76.2,
         "productos": [
             {
                 "id": "p022",
@@ -264,9 +278,11 @@
         "categoria": "Bebidas",
         "descripcion": "Café de especialidad y bebidas frías artesanales",
         "imagen_emoji": "☕",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Lun-Sáb 7:00am - 7:00pm",
+        "lat": 4.088,
+        "lng": -76.197,
         "productos": [
             {
                 "id": "p026",
@@ -304,9 +320,11 @@
         "categoria": "Bebidas",
         "descripcion": "Jugos naturales, batidos y bebidas tropicales",
         "imagen_emoji": "🥤",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Lun-Dom 8:00am - 6:00pm",
+        "lat": 4.084,
+        "lng": -76.194,
         "productos": [
             {
                 "id": "p030",
@@ -344,9 +362,11 @@
         "categoria": "Bebidas",
         "descripcion": "Malteadas, frappés y bebidas frías para el calor",
         "imagen_emoji": "🧋",
-        "direccion": "Palmira, Valle del Cauca",
+        "direccion": "Tuluá, Valle del Cauca",
         "telefono": "",
         "horario": "Mar-Dom 2:00pm - 9:00pm",
+        "lat": 4.08,
+        "lng": -76.196,
         "productos": [
             {
                 "id": "p034",
@@ -377,9 +397,11 @@
         "categoria": "Almuerzos",
         "descripcion": "Sabor auténtico de la región en un ambiente acogedor y familiar",
         "imagen_emoji": "🤠",
-        "direccion": "Calle 41a #2-41, Palmira, Valle del Cauca",
+        "direccion": "Calle 41a #2-41, Tuluá, Valle del Cauca",
         "telefono": "316 777 3135",
         "horario": "Lun-Sáb 11:00am - 4:00pm",
+        "lat": 4.0837,
+        "lng": -76.198,
         "productos": []
     }
 ]

@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — Guía de Usuario{% endblock %}
+
+{% block head_extra %}
+<style>
+    .contenedor {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 40px 0 48px;
+    }
+
+    .hero-emoji {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 16px;
+    }
+
+    .hero h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .hero p {
+        font-size: 1.05rem;
+        color: var(--gris);
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .indice {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 14px;
+        padding: 24px 28px;
+        margin-bottom: 48px;
+    }
+
+    .indice h2 {
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--gris);
+        margin-bottom: 14px;
+    }
+
+    .indice ol {
+        padding-left: 20px;
+    }
+
+    .indice li {
+        margin: 8px 0;
+    }
+
+    .indice a {
+        color: var(--acento);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .indice a:hover {
+        text-decoration: underline;
+    }
+
+    .seccion {
+        margin-bottom: 56px;
+    }
+
+    .seccion-num {
+        display: inline-block;
+        background: var(--acento);
+        color: #fff;
+        font-size: .75rem;
+        font-weight: 800;
+        border-radius: 6px;
+        padding: 2px 10px;
+        margin-bottom: 10px;
+        letter-spacing: .5px;
+    }
+
+    .seccion h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .seccion p {
+        color: var(--gris);
+        margin-bottom: 14px;
+    }
+
+    .sep {
+        height: 1px;
+        background: var(--borde);
+        margin: 48px 0;
+    }
+
+    .pasos {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .paso {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .paso-num {
+        background: var(--acento);
+        color: #fff;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+
+    .paso-contenido h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .paso-contenido p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin: 0;
+    }
+
+    .paso-contenido code {
+        background: var(--bg);
+        color: var(--acento);
+        font-family: monospace;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: .82rem;
+    }
+
+    .grid-features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .feature-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .feature-card .f-emoji {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .feature-card h3 {
+        font-size: .95rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .feature-card p {
+        font-size: .82rem;
+        color: var(--gris);
+        margin: 0;
+    }
+
+    .tip {
+        background: rgba(255, 107, 53, .08);
+        border-left: 3px solid var(--acento);
+        border-radius: 0 10px 10px 0;
+        padding: 14px 18px;
+        margin: 16px 0;
+        font-size: .88rem;
+        color: var(--gris);
+    }
+
+    .tip strong {
+        color: var(--texto);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
+
+    th {
+        background: var(--card);
+        color: var(--gris);
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 2px solid var(--borde);
+    }
+
+    td {
+        padding: 12px 14px;
+        font-size: .88rem;
+        border-bottom: 1px solid var(--borde);
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+
+    .badge.almuerzo {
+        background: var(--almuerzo);
+        color: #fff;
+    }
+
+    .badge.rapida {
+        background: var(--rapida);
+        color: #fff;
+    }
+
+    .badge.bebida {
+        background: var(--bebida);
+        color: #fff;
+    }
+
+    .descarga-box {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 14px;
+        padding: 28px 32px;
+        text-align: center;
+    }
+
+    .descarga-box h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .descarga-box p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin-bottom: 20px;
+    }
+
+    .cmds {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 420px;
+        margin: 0 auto 20px;
+    }
+
+    .cmd {
+        background: var(--bg);
+        border: 1px solid var(--borde);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-family: monospace;
+        font-size: .85rem;
+        color: var(--acento);
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cmd::before {
+        content: "$";
+        color: var(--gris);
+    }
+
+    @media (max-width: 600px) {
+        .grid-features {
+            grid-template-columns: 1fr;
+        }
+
+        .hero h1 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="contenedor">
+    <div class="hero">
+        <span class="hero-emoji">📖</span>
+        <h1>Guía de Usuario</h1>
+        <p>Todo lo que necesitas saber para usar Menugo: registro, exploración, favoritos y pagos.</p>
+    </div>
+
+    <div class="indice">
+        <h2>Contenido</h2>
+        <ol>
+            <li><a href="#inicio">¿Qué es Menugo?</a></li>
+            <li><a href="#instalacion">Instalación y arranque</a></li>
+            <li><a href="#registro">Registro e inicio de sesión</a></li>
+            <li><a href="#categorias">Explorar categorías</a></li>
+            <li><a href="#mapa">Mapa interactivo</a></li>
+            <li><a href="#favoritos">Restaurantes favoritos</a></li>
+            <li><a href="#pagos">Realizar un pago</a></li>
+            <li><a href="#categorias-tabla">Tabla de categorías</a></li>
+        </ol>
+    </div>
+
+    <div class="seccion" id="inicio">
+        <span class="seccion-num">01</span>
+        <h2>¿Qué es Menugo?</h2>
+        <p>Menugo es una aplicación web para explorar restaurantes en <strong>Tuluá, Valle del Cauca</strong>. Permite
+            descubrir menús, filtrar por categoría, guardar favoritos, ver restaurantes en el mapa y realizar pagos
+            simulados.</p>
+        <div class="grid-features">
+            <div class="feature-card"><span class="f-emoji">🗂️</span>
+                <h3>Categorías</h3>
+                <p>Navega por Almuerzos, Comida Rápida y Bebidas con un solo clic.</p>
+            </div>
+            <div class="feature-card"><span class="f-emoji">🗺️</span>
+                <h3>Mapa</h3>
+                <p>Visualiza los restaurantes en el mapa con marcadores interactivos.</p>
+            </div>
+            <div class="feature-card"><span class="f-emoji">❤️</span>
+                <h3>Favoritos</h3>
+                <p>Guarda los restaurantes que más te gustan para encontrarlos rápido.</p>
+            </div>
+            <div class="feature-card"><span class="f-emoji">💳</span>
+                <h3>Pagos</h3>
+                <p>Realiza pagos simulados de forma segura desde la propia app.</p>
+            </div>
+        </div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="instalacion">
+        <span class="seccion-num">02</span>
+        <h2>Instalación y arranque</h2>
+        <p>Requiere <strong>Python 3.10 o superior</strong>. Sigue estos pasos:</p>
+        <div class="pasos">
+            <div class="paso">
+                <div class="paso-num">1</div>
+                <div class="paso-contenido">
+                    <h3>Activa el entorno virtual</h3>
+                    <div class="cmds">
+                        <div class="cmd">.venv\Scripts\activate</div>
+                    </div>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">2</div>
+                <div class="paso-contenido">
+                    <h3>Instala dependencias</h3>
+                    <div class="cmds">
+                        <div class="cmd">pip install flask</div>
+                    </div>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">3</div>
+                <div class="paso-contenido">
+                    <h3>Ejecuta la app</h3>
+                    <div class="cmds">
+                        <div class="cmd">python main.py</div>
+                    </div>
+                    <p>Se abrirá automáticamente en <code>http://localhost:5000/login</code></p>
+                </div>
+            </div>
+        </div>
+        <div class="tip"><strong>💡 Tip:</strong> Si el navegador no se abre, visita <code>http://127.0.0.1:5000</code>
+            manualmente.</div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="registro">
+        <span class="seccion-num">03</span>
+        <h2>Registro e inicio de sesión</h2>
+        <p>Al abrir Menugo verás la pantalla de login. Si es tu primera vez, haz clic en <strong>"Regístrate
+                gratis"</strong>.</p>
+        <div class="pasos">
+            <div class="paso">
+                <div class="paso-num">1</div>
+                <div class="paso-contenido">
+                    <h3>Ingresa tu nombre completo</h3>
+                    <p>Se mostrará en el saludo de bienvenida.</p>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">2</div>
+                <div class="paso-contenido">
+                    <h3>Escribe tu correo</h3>
+                    <p>Debe tener formato válido. No puedes registrar el mismo correo dos veces.</p>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">3</div>
+                <div class="paso-contenido">
+                    <h3>Crea tu contraseña</h3>
+                    <p>Mínimo <code>4 caracteres</code>. Almacenada con hash SHA-256.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="categorias">
+        <span class="seccion-num">04</span>
+        <h2>Explorar categorías y productos</h2>
+        <p>Desde el inicio verás las categorías como tarjetas. Haz clic en una para ver sus productos.</p>
+        <div class="tip"><strong>🔍 Buscar:</strong> Usa <strong>"🔍 Buscar"</strong> en la barra de navegación para
+            filtrar productos por nombre o precio máximo.</div>
+        <div class="tip"><strong>⭐ Menú del día:</strong> El botón <strong>"⭐ Menú del día"</strong> muestra productos
+            destacados del día.</div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="mapa">
+        <span class="seccion-num">05</span>
+        <h2>Mapa interactivo</h2>
+        <p>Haz clic en <strong>"🗺️ Mapa"</strong> en la barra de navegación para ver todos los restaurantes marcados.
+        </p>
+        <div class="pasos">
+            <div class="paso">
+                <div class="paso-num">1</div>
+                <div class="paso-contenido">
+                    <h3>Filtra por categoría</h3>
+                    <p>Usa los chips de colores: Almuerzos, Comida Rápida o Bebidas.</p>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">2</div>
+                <div class="paso-contenido">
+                    <h3>Haz clic en un pin</h3>
+                    <p>Se abre un popup con nombre, dirección, horario y productos.</p>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">3</div>
+                <div class="paso-contenido">
+                    <h3>Acciones desde el popup</h3>
+                    <p><strong>"📍 Ver en Maps"</strong> abre Google Maps. <strong>"💳 Pagar"</strong> inicia el flujo
+                        de pago.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="favoritos">
+        <span class="seccion-num">06</span>
+        <h2>Restaurantes favoritos</h2>
+        <p>En la pantalla de productos verás un botón <strong>"🤍 Guardar"</strong> junto a cada producto. Al hacer clic
+            guarda ese restaurante en tu lista.</p>
+        <div class="tip"><strong>❤️ Ver favoritos:</strong> El botón <strong>"❤️ Favoritos"</strong> en la barra te
+            lleva a tu lista. Quítalos con <strong>"✕ Quitar"</strong>.</div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="pagos">
+        <span class="seccion-num">07</span>
+        <h2>Realizar un pago</h2>
+        <p>Inicia un pago desde cualquier producto con el botón <strong>"💳 Pagar"</strong>.</p>
+        <div class="pasos">
+            <div class="paso">
+                <div class="paso-num">1</div>
+                <div class="paso-contenido">
+                    <h3>Revisa el resumen</h3>
+                    <p>Verifica el producto, restaurante y precio antes de continuar.</p>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">2</div>
+                <div class="paso-contenido">
+                    <h3>Completa tus datos</h3>
+                    <p>Nombre, correo y número de tarjeta (mínimo 13 dígitos).</p>
+                </div>
+            </div>
+            <div class="paso">
+                <div class="paso-num">3</div>
+                <div class="paso-contenido">
+                    <h3>Confirma el pago</h3>
+                    <p>Recibirás una referencia única tipo <code>MNG-XXXXXXXX</code>.</p>
+                </div>
+            </div>
+        </div>
+        <div class="tip"><strong>ℹ️ Nota:</strong> El sistema de pagos es una <strong>simulación</strong> con fines
+            académicos. No se realizan cobros reales.</div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="seccion" id="categorias-tabla">
+        <span class="seccion-num">08</span>
+        <h2>Tabla de categorías</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Color</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge almuerzo">🍲 Almuerzos</span></td>
+                    <td>Platos del día, comida casera y ejecutivos</td>
+                    <td style="color:#E8593C">#E8593C</td>
+                </tr>
+                <tr>
+                    <td><span class="badge rapida">🍔 Comida Rápida</span></td>
+                    <td>Hamburguesas, pizzas y opciones express</td>
+                    <td style="color:#F0A500">#F0A500</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bebida">🥤 Bebidas</span></td>
+                    <td>Jugos naturales, café y batidos</td>
+                    <td style="color:#2196A6">#2196A6</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="descarga-box">
+        <h3>📦 Requisitos del sistema</h3>
+        <p>Para ejecutar Menugo necesitas lo siguiente instalado en tu equipo.</p>
+        <div class="cmds" style="max-width:500px">
+            <div class="cmd">Python 3.10+</div>
+            <div class="cmd">pip install flask</div>
+        </div>
+        <p style="font-size:.8rem;color:var(--gris)">Menugo fue desarrollado y probado en Windows 11 con Python 3.12.
+        </p>
+    </div>
+</div>
+{% endblock %}

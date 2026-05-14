@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — Crear cuenta{% endblock %}
+
+{% block head_extra %}
+<style>
+    .auth-wrap {
+        min-height: calc(100vh - 60px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .auth-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 20px;
+        padding: 40px 36px;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .auth-logo {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .auth-logo .emoji {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .auth-logo h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .auth-logo p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin-top: 4px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--gris);
+        margin-bottom: 6px;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+    }
+
+    .form-group input {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--borde);
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: var(--texto);
+        font-size: .95rem;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+    .form-group input:focus {
+        border-color: var(--acento);
+    }
+
+    .form-group input::placeholder {
+        color: var(--gris);
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: var(--acento);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .2s, transform .1s;
+        margin-top: 6px;
+    }
+
+    .btn-submit:hover {
+        background: #e05a25;
+    }
+
+    .btn-submit:active {
+        transform: scale(.98);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 22px;
+        font-size: .85rem;
+        color: var(--gris);
+    }
+
+    .auth-footer a {
+        color: var(--acento);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alerta {
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: .85rem;
+        margin-bottom: 18px;
+    }
+
+    .alerta.error {
+        background: rgba(224, 82, 82, .1);
+        border: 1px solid var(--error);
+        color: var(--error);
+    }
+
+    .alerta.exito {
+        background: rgba(46, 204, 113, .1);
+        border: 1px solid var(--verde);
+        color: var(--verde);
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <span class="emoji">✨</span>
+            <h1>Crear cuenta</h1>
+            <p>Únete a Menugo y descubre lo mejor de Tuluá</p>
+        </div>
+
+        {% if error %}
+        <div class="alerta error">⚠️ {{ error }}</div>
+        {% endif %}
+        {% if exito %}
+        <div class="alerta exito">✅ {{ exito }} — <a href="/login" style="color:var(--verde);font-weight:700">Inicia
+                sesión aquí</a></div>
+        {% endif %}
+
+        <form method="POST" action="/registro">
+            <div class="form-group">
+                <label>Nombre completo</label>
+                <input type="text" name="nombre" placeholder="Tu nombre" required autofocus />
+            </div>
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <input type="email" name="correo" placeholder="tu@correo.com" required />
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" placeholder="Mínimo 4 caracteres" required />
+            </div>
+            <button type="submit" class="btn-submit">Crear cuenta →</button>
+        </form>
+
+        <div class="auth-footer">
+            ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

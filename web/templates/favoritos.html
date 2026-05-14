@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — Favoritos{% endblock %}
+
+{% block head_extra %}
+<style>
+    .page-header {
+        background: var(--card);
+        border-bottom: 4px solid #e05252;
+        padding: 28px;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin-top: 4px;
+    }
+
+    .grid-favs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 18px;
+    }
+
+    .fav-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform .18s, border-color .18s;
+    }
+
+    .fav-card:hover {
+        transform: translateY(-3px);
+        border-color: #e05252;
+    }
+
+    .fav-franja {
+        height: 4px;
+    }
+
+    .fav-body {
+        padding: 20px;
+    }
+
+    .fav-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .fav-emoji {
+        font-size: 2rem;
+    }
+
+    .fav-nombre {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .fav-cat {
+        font-size: .75rem;
+        color: var(--gris);
+    }
+
+    .fav-info {
+        font-size: .8rem;
+        color: var(--gris);
+        line-height: 1.8;
+        margin-bottom: 14px;
+    }
+
+    .fav-info span {
+        color: var(--texto);
+    }
+
+    .fav-footer {
+        padding: 12px 20px;
+        border-top: 1px solid var(--borde);
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-quitar {
+        background: transparent;
+        border: 1px solid var(--borde);
+        border-radius: 8px;
+        color: var(--gris);
+        font-size: .78rem;
+        font-weight: 600;
+        padding: 7px 12px;
+        cursor: pointer;
+        transition: all .18s;
+    }
+
+    .btn-quitar:hover {
+        border-color: #e05252;
+        color: #e05252;
+    }
+
+    .btn-ver {
+        background: var(--acento);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: .78rem;
+        font-weight: 700;
+        padding: 7px 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .18s;
+    }
+
+    .btn-ver:hover {
+        background: #e05a25;
+    }
+
+    .vacio {
+        text-align: center;
+        padding: 100px 20px;
+        color: var(--gris);
+    }
+
+    .vacio .ico {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 16px;
+    }
+
+    .vacio h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--texto);
+        margin-bottom: 8px;
+    }
+
+    .vacio a {
+        color: var(--acento);
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="page-header">
+    <h1>❤️ Mis favoritos</h1>
+    <p>{{ favoritos | length }} restaurante{{ 's' if favoritos | length != 1 else '' }} guardado{{ 's' if favoritos |
+        length != 1 else '' }}</p>
+</div>
+
+<div class="contenedor">
+    {% if favoritos %}
+    <div class="grid-favs">
+        {% set colores = {'Almuerzos': '#E8593C', 'Comida Rápida': '#F0A500', 'Bebidas': '#2196A6'} %}
+        {% for r in favoritos %}
+        {% set color = colores.get(r.categoria, '#FF6B35') %}
+        <div class="fav-card" id="fav-{{ r.id }}">
+            <div class="fav-franja" style="background: {{ color }}"></div>
+            <div class="fav-body">
+                <div class="fav-top">
+                    <span class="fav-emoji">{{ r.imagen_emoji or '🍽️' }}</span>
+                    <div>
+                        <div class="fav-nombre">{{ r.nombre }}</div>
+                        <div class="fav-cat">{{ r.categoria }}</div>
+                    </div>
+                </div>
+                <div class="fav-info">
+                    {% if r.direccion %}<div>📍 <span>{{ r.direccion }}</span></div>{% endif %}
+                    {% if r.horario %}<div>🕐 <span>{{ r.horario }}</span></div>{% endif %}
+                    {% if r.telefono %}<div>📞 <span>{{ r.telefono }}</span></div>{% endif %}
+                    <div>🍴 <span>{{ r.productos | length }} producto{{ 's' if r.productos | length != 1 else ''
+                            }}</span></div>
+                </div>
+            </div>
+            <div class="fav-footer">
+                <button class="btn-quitar" onclick="quitarFavorito('{{ r.id }}', this)">✕ Quitar</button>
+                <a href="/productos/{{ r.categoria | urlencode }}" class="btn-ver">Ver menú →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="vacio">
+        <span class="ico">🤍</span>
+        <h2>Aún no tienes favoritos</h2>
+        <p>Explora las categorías y guarda los restaurantes que más te gusten.</p>
+        <br>
+        <a href="/principal">Explorar restaurantes →</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    async function quitarFavorito(restauranteId, btn) {
+        try {
+            const res = await fetch('/api/favorito', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ restaurante_id: restauranteId })
+            });
+            const data = await res.json();
+            if (data.exito) {
+                const card = document.getElementById('fav-' + restauranteId);
+                card.style.transition = 'opacity .3s, transform .3s';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(.95)';
+                setTimeout(() => card.remove(), 300);
+            }
+        } catch (e) { alert('Error al quitar favorito.'); }
+    }
+</script>
+{% endblock %}

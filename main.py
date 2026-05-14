@@ -1,124 +1,43 @@
 """
-main.py  ─  Controlador de navegación de Menugo.
-Sprint 2: añadidos _ir_menu_dia() y _ir_filtros().
-Sprint 3: añadido _ir_mapa().
+main.py  —  Menugo (versión web completa)
+Lanza Flask y abre el navegador. Ya no usa Tkinter.
 Ejecutar con: python main.py
 """
 
-import tkinter as tk
+import threading
+import webbrowser
+import time
 
-from ui.login     import PantallaLogin
-from ui.register  import PantallaRegistro
-from ui.main      import PantallaPrincipal
-from ui.favoritos import PantallaFavoritos
-from ui.menu_dia  import PantallaMenuDia
-from ui.filtros   import PantallaFiltros
-from ui.mapa      import PantallaMapa
+PUERTO = 5000
 
-BG_PRINCIPAL = "#0F1923"
+def _lanzar_flask():
+    from web.servidor import iniciar_servidor
+    iniciar_servidor(PUERTO)
 
+def main():
+    print("=" * 42)
+    print("  🍽️  Menugo — iniciando servidor...")
+    print("=" * 42)
 
-class AppMenugo(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Menugo")
-        self.geometry("680x660")
-        self.resizable(False, False)
-        self.configure(bg=BG_PRINCIPAL)
+    hilo = threading.Thread(target=_lanzar_flask, daemon=True)
+    hilo.start()
 
-        self._usuario_activo = None
-        self._frame_actual   = None
+    # Esperar que Flask levante antes de abrir el navegador
+    time.sleep(1.5)
 
-        self._ir_login()
+    url = f"http://127.0.0.1:{PUERTO}/login"
+    print(f"  ✅ Servidor listo en {url}")
+    print("  Cierra esta ventana para detener la app.")
+    print("=" * 42)
 
-    # ── Motor de navegación ───────────────────────────────────────────────────
+    webbrowser.open(url)
 
-    def _cambiar_frame(self, nuevo_frame: tk.Frame):
-        if self._frame_actual is not None:
-            self._frame_actual.destroy()
-        self._frame_actual = nuevo_frame
-        self._frame_actual.pack(fill="both", expand=True)
-
-    # ── Rutas ─────────────────────────────────────────────────────────────────
-
-    def _ir_login(self):
-        self._cambiar_frame(
-            PantallaLogin(
-                self,
-                on_login_exitoso=self._on_login_exitoso,
-                on_ir_registro=self._ir_registro,
-            )
-        )
-
-    def _ir_registro(self):
-        self._cambiar_frame(
-            PantallaRegistro(
-                self,
-                on_registro_exitoso=self._on_login_exitoso,
-                on_ir_login=self._ir_login,
-            )
-        )
-
-    def _ir_principal(self):
-        self._cambiar_frame(
-            PantallaPrincipal(
-                self,
-                usuario=self._usuario_activo,
-                on_categoria=self._ir_productos,
-                on_favoritos=self._ir_favoritos,
-                on_menu_dia=self._ir_menu_dia,
-                on_filtros=self._ir_filtros,
-                on_mapa=self._ir_mapa,          # ← nuevo
-            )
-        )
-
-    def _ir_productos(self, categoria: str):
-        from ui.productos import abrir_productos
-        abrir_productos(categoria, self._usuario_activo, on_volver=self._ir_principal)
-
-    def _ir_favoritos(self):
-        self._cambiar_frame(
-            PantallaFavoritos(
-                self,
-                usuario=self._usuario_activo,
-                on_volver=self._ir_principal,
-            )
-        )
-
-    def _ir_menu_dia(self):
-        self._cambiar_frame(
-            PantallaMenuDia(
-                self,
-                on_volver=self._ir_principal,
-                usuario=self._usuario_activo,
-            )
-        )
-
-    def _ir_filtros(self):
-        self._cambiar_frame(
-            PantallaFiltros(
-                self,
-                on_volver=self._ir_principal,
-                usuario=self._usuario_activo,
-            )
-        )
-
-    def _ir_mapa(self):                          # ← nuevo
-        self._cambiar_frame(
-            PantallaMapa(
-                self,
-                on_volver=self._ir_principal,
-                usuario=self._usuario_activo,
-            )
-        )
-
-    # ── Callbacks ─────────────────────────────────────────────────────────────
-
-    def _on_login_exitoso(self, usuario: dict):
-        self._usuario_activo = usuario
-        self._ir_principal()
-
+    # Mantener el proceso vivo mientras el hilo daemon corre
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n  👋 Menugo cerrado.")
 
 if __name__ == "__main__":
-    app = AppMenugo()
-    app.mainloop()
+    main()

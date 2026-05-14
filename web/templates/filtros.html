@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block titulo %}Menugo — Buscar productos{% endblock %}
+
+{% block head_extra %}
+<style>
+    .page-header {
+        background: var(--card);
+        border-bottom: 4px solid var(--acento);
+        padding: 28px;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .page-header p {
+        font-size: .88rem;
+        color: var(--gris);
+        margin-top: 4px;
+    }
+
+    /* Formulario de búsqueda */
+    .busqueda-form {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 32px;
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    @media (max-width: 640px) {
+        .busqueda-form {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-group label {
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: var(--gris);
+    }
+
+    .form-group input,
+    .form-group select {
+        background: var(--bg);
+        border: 1px solid var(--borde);
+        border-radius: 10px;
+        padding: 10px 14px;
+        color: var(--texto);
+        font-size: .9rem;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: var(--acento);
+    }
+
+    .form-group input::placeholder {
+        color: var(--gris);
+    }
+
+    .form-group select option {
+        background: var(--card);
+    }
+
+    .btn-buscar {
+        background: var(--acento);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+        font-size: .88rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .18s;
+        white-space: nowrap;
+        align-self: end;
+    }
+
+    .btn-buscar:hover {
+        background: #e05a25;
+    }
+
+    .btn-limpiar {
+        background: transparent;
+        color: var(--gris);
+        border: 1px solid var(--borde);
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: .88rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all .18s;
+        align-self: end;
+        white-space: nowrap;
+    }
+
+    .btn-limpiar:hover {
+        border-color: var(--texto);
+        color: var(--texto);
+    }
+
+    /* Resultados */
+    .resultados-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .resultados-titulo {
+        font-size: .78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--gris);
+    }
+
+    .resultados-count {
+        font-size: .82rem;
+        color: var(--acento);
+        font-weight: 600;
+    }
+
+    .grid-resultados {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .res-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform .18s, border-color .18s;
+    }
+
+    .res-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--acento);
+    }
+
+    .res-franja {
+        height: 3px;
+    }
+
+    .res-body {
+        padding: 16px;
+    }
+
+    .res-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .res-nombre {
+        font-size: .95rem;
+        font-weight: 700;
+    }
+
+    .res-precio {
+        font-size: .95rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .res-desc {
+        font-size: .8rem;
+        color: var(--gris);
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+
+    .res-rest {
+        font-size: .75rem;
+        color: var(--gris);
+    }
+
+    .res-rest span {
+        color: var(--texto);
+    }
+
+    .res-footer {
+        padding: 10px 16px;
+        border-top: 1px solid var(--borde);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-pagar {
+        background: var(--acento);
+        border: none;
+        border-radius: 7px;
+        color: #fff;
+        font-size: .78rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .18s;
+    }
+
+    .btn-pagar:hover {
+        background: #e05a25;
+    }
+
+    .estado-vacio {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--gris);
+    }
+
+    .estado-inicial {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--gris);
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="page-header">
+    <h1>🔍 Buscar productos</h1>
+    <p>Encuentra por nombre, categoría o precio máximo</p>
+</div>
+
+<div class="contenedor">
+    <form method="GET" action="/filtros" class="busqueda-form">
+        <div class="form-group" style="min-width:160px">
+            <label>Nombre del producto</label>
+            <input type="text" name="q" value="{{ termino }}" placeholder="Ej: bandeja, café…" autofocus />
+        </div>
+        <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria">
+                <option value="">Todas</option>
+                {% for cat in categorias %}
+                <option value="{{ cat }}" {% if cat==categoria %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Precio máximo</label>
+            <input type="number" name="precio_max" value="{{ precio_max }}" placeholder="Ej: 20000" min="0" step="1000"
+                style="width:130px" />
+        </div>
+        <button type="submit" class="btn-buscar">Buscar</button>
+        <a href="/filtros" class="btn-limpiar">Limpiar</a>
+    </form>
+
+    {% if termino %}
+    {% set colores = {'Almuerzos': '#E8593C', 'Comida Rápida': '#F0A500', 'Bebidas': '#2196A6'} %}
+    <div class="resultados-header">
+        <span class="resultados-titulo">Resultados</span>
+        <span class="resultados-count">{{ resultados | length }} encontrado{{ 's' if resultados | length != 1 else ''
+            }}</span>
+    </div>
+    {% if resultados %}
+    <div class="grid-resultados">
+        {% for p in resultados %}
+        {% set color = colores.get(p.get('categoria_rest', ''), '#FF6B35') %}
+        <div class="res-card">
+            <div class="res-franja"
+                style="background: {{ colores.get(categoria, '#FF6B35') if categoria else '#FF6B35' }}"></div>
+            <div class="res-body">
+                <div class="res-top">
+                    <span class="res-nombre">{{ p.nombre }}</span>
+                    <span class="res-precio" style="color: var(--acento)">${{ '{:,}'.format(p.precio) }}</span>
+                </div>
+                {% if p.descripcion %}
+                <p class="res-desc">{{ p.descripcion }}</p>
+                {% endif %}
+                <div class="res-rest">📍 <span>{{ p.restaurante }}</span></div>
+            </div>
+            <div class="res-footer">
+                <a href="/pago?restaurante_id={{ p.restaurante_id }}&producto_id={{ p.id }}" class="btn-pagar">💳
+                    Pagar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="estado-vacio">
+        <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+        No se encontraron productos para <strong style="color:var(--texto)">"{{ termino }}"</strong>.
+        <br><br>
+        Intenta con otro término o sin filtros.
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="estado-inicial">
+        <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+        Escribe un nombre de producto para comenzar a buscar.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
