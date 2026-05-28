@@ -1,42 +1,38 @@
 """
 ui/productos.py
 Pantalla que muestra los productos de una categoría seleccionada.
-Incluye el nombre del restaurante de origen de cada producto.
+Sprint 4: añadido botón 💳 Pagar que abre el navegador en /pago.
 """
 
 import tkinter as tk
 from tkinter import ttk
+import webbrowser
 from utils.file_handler import leer_productos_por_categoria
 
 COLORES_CATEGORIA = {
-    'almuerzos':     '#E8593C',
-    'comida_rapida': '#F0A500',
-    'bebidas':       '#2196A6',
+    'Almuerzos':     '#E8593C',
+    'Comida Rápida': '#F0A500',
+    'Bebidas':       '#2196A6',
 }
 
 EMOJIS_CATEGORIA = {
-    'almuerzos':     '🍱',
-    'comida_rapida': '🍔',
-    'bebidas':       '🥤',
+    'Almuerzos':     '🍱',
+    'Comida Rápida': '🍔',
+    'Bebidas':       '🥤',
 }
+
+PUERTO_WEB = 5000
 
 
 def abrir_productos(categoria: str, usuario: dict, on_volver=None):
-    """
-    Abre la pantalla de productos de una categoría.
-    - categoria: clave de categoría (ej: 'almuerzos').
-    - usuario: dict con los datos del usuario autenticado.
-    - on_volver: callback para regresar a la pantalla principal.
-    """
     ventana = tk.Tk()
-    ventana.title(f"Menugo — {categoria.replace('_', ' ').title()}")
+    ventana.title(f"Menugo — {categoria}")
     ventana.geometry("500x620")
     ventana.resizable(False, False)
     ventana.configure(bg="#F7F5F2")
 
     color    = COLORES_CATEGORIA.get(categoria, '#888888')
     emoji    = EMOJIS_CATEGORIA.get(categoria, '🍽️')
-    titulo   = categoria.replace('_', ' ').title()
     productos = leer_productos_por_categoria(categoria)
 
     # ── Barra superior ───────────────────────────
@@ -44,16 +40,15 @@ def abrir_productos(categoria: str, usuario: dict, on_volver=None):
     barra.pack(fill="x")
     barra.pack_propagate(False)
 
-    btn_volver = tk.Button(
+    tk.Button(
         barra, text="← Volver",
         font=("Helvetica", 10), bg=color, fg="#FFFFFF",
         activebackground=color, activeforeground="#FFFFFF",
         relief="flat", cursor="hand2",
         command=lambda: [ventana.destroy(), on_volver() if on_volver else None]
-    )
-    btn_volver.pack(side="left", padx=16, pady=16)
+    ).pack(side="left", padx=16, pady=16)
 
-    tk.Label(barra, text=f"{emoji}  {titulo}",
+    tk.Label(barra, text=f"{emoji}  {categoria}",
              font=("Helvetica", 16, "bold"),
              bg=color, fg="#FFFFFF").pack(side="left", pady=16)
 
@@ -66,10 +61,8 @@ def abrir_productos(categoria: str, usuario: dict, on_volver=None):
     frame_scroll = tk.Frame(ventana, bg="#F7F5F2")
     frame_scroll.pack(fill="both", expand=True, padx=24)
 
-    canvas = tk.Canvas(frame_scroll, bg="#F7F5F2",
-                       highlightthickness=0, bd=0)
-    scrollbar = ttk.Scrollbar(frame_scroll, orient="vertical",
-                               command=canvas.yview)
+    canvas = tk.Canvas(frame_scroll, bg="#F7F5F2", highlightthickness=0, bd=0)
+    scrollbar = ttk.Scrollbar(frame_scroll, orient="vertical", command=canvas.yview)
     frame_contenido = tk.Frame(canvas, bg="#F7F5F2")
 
     frame_contenido.bind(
@@ -79,11 +72,9 @@ def abrir_productos(categoria: str, usuario: dict, on_volver=None):
 
     canvas.create_window((0, 0), window=frame_contenido, anchor="nw")
     canvas.configure(yscrollcommand=scrollbar.set)
-
     canvas.pack(side="left", fill="both", expand=True)
     scrollbar.pack(side="right", fill="y")
 
-    # Scroll con rueda del mouse
     canvas.bind_all("<MouseWheel>",
                     lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
 
@@ -105,18 +96,15 @@ def abrir_productos(categoria: str, usuario: dict, on_volver=None):
 
 
 def _crear_tarjeta_producto(parent, producto: dict, color_acento: str):
-    """Crea una tarjeta visual para un producto individual."""
     card = tk.Frame(parent, bg="#FFFFFF", relief="flat")
     card.pack(fill="x", pady=6)
 
-    # Franja superior de color
     tk.Frame(card, bg=color_acento, height=4).pack(fill="x")
 
-    # Cuerpo
     cuerpo = tk.Frame(card, bg="#FFFFFF")
     cuerpo.pack(fill="x", padx=18, pady=14)
 
-    # Fila superior: nombre + precio
+    # Nombre + precio
     fila_top = tk.Frame(cuerpo, bg="#FFFFFF")
     fila_top.pack(fill="x")
 
@@ -134,34 +122,39 @@ def _crear_tarjeta_producto(parent, producto: dict, color_acento: str):
     # Descripción
     descripcion = producto.get('descripcion', '')
     if descripcion:
-        tk.Label(cuerpo,
-                 text=descripcion,
-                 font=("Helvetica", 10),
-                 bg="#FFFFFF", fg="#888888",
+        tk.Label(cuerpo, text=descripcion,
+                 font=("Helvetica", 10), bg="#FFFFFF", fg="#888888",
                  anchor="w", wraplength=400, justify="left").pack(fill="x", pady=(4, 6))
 
-    # Restaurante de origen
-    restaurante = producto.get('restaurante', '')
+    # Restaurante + badge menú del día
     frame_rest = tk.Frame(cuerpo, bg="#FFFFFF")
     frame_rest.pack(fill="x", pady=(2, 0))
 
-    tk.Label(frame_rest, text="📍",
-             font=("Helvetica", 10), bg="#FFFFFF").pack(side="left")
-
+    tk.Label(frame_rest, text="📍", font=("Helvetica", 10), bg="#FFFFFF").pack(side="left")
     tk.Label(frame_rest,
-             text=restaurante,
-             font=("Helvetica", 10),
-             bg="#FFFFFF", fg="#AAAAAA", anchor="w").pack(side="left", padx=4)
+             text=producto.get('restaurante', ''),
+             font=("Helvetica", 10), bg="#FFFFFF", fg="#AAAAAA",
+             anchor="w").pack(side="left", padx=4)
 
-    # Badge menú del día
     if producto.get('menu_del_dia'):
-        badge = tk.Label(frame_rest, text="⭐ Menú del día",
-                         font=("Helvetica", 9, "bold"),
-                         bg="#FFF3E0", fg="#E65100",
-                         padx=6, pady=2)
-        badge.pack(side="right")
+        tk.Label(frame_rest, text="⭐ Menú del día",
+                 font=("Helvetica", 9, "bold"),
+                 bg="#FFF3E0", fg="#E65100",
+                 padx=6, pady=2).pack(side="right")
 
+    # ── Botón Pagar ── Sprint 4
+    rid = producto.get('restaurante_id', '')
+    pid = producto.get('id', '')
 
-if __name__ == "__main__":
-    usuario_prueba = {'nombre': 'Carlos Pérez', 'correo': 'carlos@test.com'}
-    abrir_productos('almuerzos', usuario_prueba)
+    tk.Button(
+        cuerpo,
+        text="💳 Pagar",
+        font=("Helvetica", 10, "bold"),
+        bg="#FF6B35", fg="#FFFFFF",
+        activebackground="#E55A26", activeforeground="#FFFFFF",
+        relief="flat", cursor="hand2",
+        padx=12, pady=6,
+        command=lambda r=rid, p=pid: webbrowser.open(
+            f"http://127.0.0.1:{PUERTO_WEB}/pago?restaurante_id={r}&producto_id={p}"
+        )
+    ).pack(anchor="e", pady=(10, 0))

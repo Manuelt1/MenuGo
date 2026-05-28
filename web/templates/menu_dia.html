@@ -153,7 +153,7 @@
             <div class="menu-body">
                 <div class="menu-top">
                     <span class="menu-nombre">{{ p.nombre }}</span>
-                    <span class="menu-precio">${{ '{:,}'.format(p.precio) }}</span>
+                    <span class="menu-precio">${{ "{:,}".format(p.precio | int) }}</span>
                 </div>
                 {% if p.descripcion %}
                 <p class="menu-desc">{{ p.descripcion }}</p>

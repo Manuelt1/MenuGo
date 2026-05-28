@@ -3,6 +3,7 @@ ui/main.py
 Pantalla principal de Menugo.
 Sprint 2: añadidos botones ⭐ Menú del día y 🔍 Buscar en el header.
 Sprint 3: añadido botón 🗺 Mapa.
+Sprint 4: añadido botón 📖 Guía.
 """
 
 import tkinter as tk
@@ -28,16 +29,6 @@ DESC_DEFAULT  = "Explora esta categoría"
 
 
 class PantallaPrincipal(tk.Frame):
-    """
-    Frame principal con tarjetas de categorías.
-    Callbacks:
-      on_categoria(str)  → navegar a productos de esa categoría
-      on_favoritos()     → navegar a favoritos
-      on_menu_dia()      → navegar al menú del día
-      on_filtros()       → navegar a búsqueda
-      on_mapa()          → navegar al mapa  [Sprint 3]
-    """
-
     def __init__(
         self,
         parent,
@@ -47,6 +38,7 @@ class PantallaPrincipal(tk.Frame):
         on_menu_dia=None,
         on_filtros=None,
         on_mapa=None,
+        on_guia=None,
     ):
         super().__init__(parent, bg=BG_PRINCIPAL)
         self.usuario      = usuario
@@ -55,6 +47,7 @@ class PantallaPrincipal(tk.Frame):
         self.on_menu_dia  = on_menu_dia or (lambda: None)
         self.on_filtros   = on_filtros  or (lambda: None)
         self.on_mapa      = on_mapa     or (lambda: None)
+        self.on_guia      = on_guia     or (lambda: None)
         self._tarjetas    = []
         self._construir()
 
@@ -124,7 +117,7 @@ class PantallaPrincipal(tk.Frame):
             command=self.on_filtros,
         ).pack(side="right", padx=4)
 
-        # Botón Mapa ── Sprint 3
+        # Botón Mapa
         tk.Button(
             header,
             text="🗺 Mapa",
@@ -135,6 +128,19 @@ class PantallaPrincipal(tk.Frame):
             relief="flat", cursor="hand2",
             padx=10, pady=5,
             command=self.on_mapa,
+        ).pack(side="right", padx=4)
+
+        # Botón Guía ── Sprint 4
+        tk.Button(
+            header,
+            text="📖 Guía",
+            font=("Helvetica", 9, "bold"),
+            bg=BG_CARD, fg=COLOR_TEXTO,
+            activebackground=BG_CARD_HOVER,
+            activeforeground=COLOR_TEXTO,
+            relief="flat", cursor="hand2",
+            padx=10, pady=5,
+            command=self.on_guia,
         ).pack(side="right", padx=4)
 
     def _construir_saludo(self):

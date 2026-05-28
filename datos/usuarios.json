@@ -18,5 +18,10 @@
     "nombre": "manuel",
     "correo": "ta@gmail.com",
     "contrasena": "7ae707486e459a239b461574df7afc0f6ab97ae6d550f5b63acfc7c60fa7565c"
+  },
+  {
+    "nombre": "alejandro",
+    "correo": "alej@hola.com",
+    "contrasena": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"
   }
 ]

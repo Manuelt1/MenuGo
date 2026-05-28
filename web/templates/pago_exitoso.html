@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block titulo %}Pago exitoso — Menugo{% endblock %}
+
+{% block head_extra %}
+<style>
+    .exitoso-wrapper {
+        max-width: 520px;
+        margin: 60px auto;
+        padding: 0 20px 80px;
+        text-align: center;
+    }
+
+    /* ── Icono animado ── */
+    .check-circulo {
+        width: 90px;
+        height: 90px;
+        background: rgba(46, 204, 113, .12);
+        border: 3px solid var(--verde);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 2.8rem;
+        animation: popIn .4s cubic-bezier(.175, .885, .32, 1.275);
+    }
+
+    @keyframes popIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .exitoso-titulo {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--verde);
+        margin-bottom: 8px;
+    }
+
+    .exitoso-subtitulo {
+        font-size: .95rem;
+        color: var(--gris);
+        margin-bottom: 32px;
+        line-height: 1.6;
+    }
+
+    /* ── Tarjeta de confirmación ── */
+    .confirmacion-card {
+        background: var(--card);
+        border: 1px solid var(--borde);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 28px;
+        text-align: left;
+    }
+
+    .confirmacion-header {
+        background: var(--verde);
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .confirmacion-header h3 {
+        font-size: .95rem;
+        font-weight: 800;
+        color: #fff;
+    }
+
+    .confirmacion-body {
+        padding: 20px;
+    }
+
+    .conf-fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--borde);
+        font-size: .88rem;
+    }
+
+    .conf-fila:last-child {
+        border-bottom: none;
+    }
+
+    .conf-fila .label {
+        color: var(--gris);
+    }
+
+    .conf-fila .valor {
+        font-weight: 600;
+        color: var(--texto);
+    }
+
+    .ref-badge {
+        background: rgba(46, 204, 113, .1);
+        border: 1px solid rgba(46, 204, 113, .25);
+        color: var(--verde);
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: .9rem;
+        font-weight: 700;
+        letter-spacing: .5px;
+    }
+
+    /* ── Botones ── */
+    .acciones {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .btn-accion {
+        padding: 13px;
+        border-radius: 12px;
+        font-size: .88rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        transition: all .18s;
+        border: none;
+    }
+
+    .btn-inicio {
+        background: var(--acento);
+        color: #fff;
+    }
+
+    .btn-inicio:hover {
+        background: #e05a25;
+    }
+
+    .btn-menu {
+        background: var(--card);
+        color: var(--texto);
+        border: 1px solid var(--borde);
+    }
+
+    .btn-menu:hover {
+        border-color: var(--acento);
+        color: var(--acento);
+    }
+
+    /* ── Nota ── */
+    .nota-final {
+        font-size: .78rem;
+        color: var(--gris);
+        line-height: 1.6;
+    }
+
+    .nota-final a {
+        color: var(--acento);
+        text-decoration: none;
+    }
+
+    .nota-final a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="exitoso-wrapper">
+
+    <div class="check-circulo">✅</div>
+
+    <h1 class="exitoso-titulo">¡Pago exitoso!</h1>
+    <p class="exitoso-subtitulo">
+        Tu pedido fue procesado correctamente.<br>
+        Guarda tu referencia para cualquier consulta.
+    </p>
+
+    <!-- Tarjeta de confirmación -->
+    <div class="confirmacion-card">
+        <div class="confirmacion-header">
+            <span>🧾</span>
+            <h3>Confirmación de pago</h3>
+        </div>
+        <div class="confirmacion-body">
+
+            <div class="conf-fila">
+                <span class="label">Estado</span>
+                <span class="valor" style="color: var(--verde);">✅ Aprobado</span>
+            </div>
+
+            {% if session_id %}
+            <div class="conf-fila">
+                <span class="label">Referencia</span>
+                <span class="ref-badge">{{ session_id[:20] }}...</span>
+            </div>
+            {% endif %}
+
+            <div class="conf-fila">
+                <span class="label">Usuario</span>
+                <span class="valor">{{ usuario.nombre if usuario else '—' }}</span>
+            </div>
+
+            <div class="conf-fila">
+                <span class="label">Correo</span>
+                <span class="valor" style="font-size:.82rem">{{ usuario.correo if usuario else '—' }}</span>
+            </div>
+
+            <div class="conf-fila">
+                <span class="label">Procesado por</span>
+                <span class="valor">🔒 Stripe Checkout</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="acciones">
+        <a href="/principal" class="btn-accion btn-inicio">🏠 Ir al inicio</a>
+        <a href="/menu-dia" class="btn-accion btn-menu">⭐ Ver menú del día</a>
+    </div>
+
+    <p class="nota-final">
+        ¿Tienes algún problema con tu pedido?<br>
+        Visita la <a href="/guia">Guía de usuario</a> o contacta al restaurante directamente.
+    </p>
+
+</div>
+{% endblock %}
